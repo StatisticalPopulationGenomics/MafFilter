@@ -1,0 +1,9 @@
+# maffilter param=MinimalistExample.bpp DATA=chr9
+input.file=../Primates/$(DATA).maf.gz
+input.file.compression=gzip
+input.format=Maf
+output.log=$(DATA).maffilter.log
+maf.filter=\
+    MinBlockLength(min_length=1000),\
+    Output(file=$(DATA).min1kb.maf.gz, compression=gzip)
+
