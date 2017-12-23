@@ -1,0 +1,34 @@
+# maffilter param=ExtractingData.bpp DATA=chr9
+# Note: need to create subdirectory Alignments: mkdir Alignments
+# before running this script
+
+input.file=../Primates/$(DATA).maf.gz
+input.file.compression=gzip
+input.format=Maf
+output.log=$(DATA).maffilter.log
+SPECIES=(hg38, panPan1, panTro4, gorGor3, ponAbe2)
+maf.filter=                                        \
+  Subset(                                          \
+      species=$(SPECIES),                          \
+      strict=yes, keep=no,                         \
+      remove_duplicates=yes),                      \
+  Merge(                                           \
+      species=$(SPECIES),                          \
+      dist_max=0),                                 \
+  ExtractFeature(                                  \
+      ref_species=hg38,                            \
+      feature.file=../Primates/chr9.CDS1kb.gtf,    \
+      feature.file.compression=none,               \
+      feature.format=GTF,                          \
+      feature.type=CDS,                            \
+      file=$(DATA).noncoding.maf.gz,               \
+      compression=gzip,                            \
+      complete=yes,                                \
+      ignore_strand=no,                            \
+      verbose=no),                                 \
+  OutputAlignments(                                \
+      format=Clustal,                              \
+      file=Alignments/FivePrimates%i.aln,          \
+      compression=none,                            \
+      mask=yes)                                    \
+
