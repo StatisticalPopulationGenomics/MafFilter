@@ -18,17 +18,11 @@ maf.filter=                                        \
   ExtractFeature(                                  \
       ref_species=hg38,                            \
       feature.file=../Primates/chr9.CDS1kb.gtf,    \
-      feature.file.compression=none,               \
       feature.format=GTF,                          \
-      feature.type=CDS,                            \
-      file=$(DATA).noncoding.maf.gz,               \
-      compression=gzip,                            \
       complete=yes,                                \
-      ignore_strand=no,                            \
-      verbose=no),                                 \
+      ignore_strand=no),                           \
   OutputAlignments(                                \
       format=Clustal,                              \
-      file=Alignments/FivePrimates%i.aln,          \
-      compression=none,                            \
-      mask=yes)                                    \
+      file=Alignments/FivePrimates%i-%c-%b-%e.aln, \
+      reference=hg38),                             \
 
