@@ -1,7 +1,8 @@
 # maffilter param=Maffilter-Diversity.bpp 
 
 DATA=dpgp3_Chr2L_10indv
-INDV=ZI152,ZI173,ZI190,ZI199,ZI211,ZI219,ZI253,ZI344,ZI374,ZI490
+INDV=ZI152,ZI173,ZI190,ZI199,ZI211,ZI219,\
+     ZI253,ZI344,ZI374,ZI490
 REF=ZI152
 WSIZE=10000
 
@@ -11,45 +12,45 @@ input.format=Maf
 output.log=$(DATA).maffilter-diversity.log
 maf.filter=                                        \
   SequenceStatistics(                              \
-      statistics=(BlockLength,BlockSize),          \
-      ref_species=$(REF),                          \
-      file=$(DATA).statistics1.txt),               \
+    statistics=(BlockLength,BlockSize),            \
+    ref_species=$(REF),                            \
+    file=$(DATA).statistics1.txt),                 \
   AlnFilter(                                       \
-      species=($(INDV)),                           \
-      window.size=10,                              \
-      window.step=1,                               \
-      missing_as_gap=yes,                          \
-      max.gap=0.3,                                 \
-      max.ent=-1,                                  \
-      relative=yes,                                \
-      file=$(DATA).trash_aln.maf,                  \
-      compression=none,                            \
-      verbose=yes),                                \
+    species=($(INDV)),                             \
+    window.size=10,                                \
+    window.step=1,                                 \
+    missing_as_gap=yes,                            \
+    max.gap=0.3,                                   \
+    max.ent=-1,                                    \
+    relative=yes,                                  \
+    file=$(DATA).trash_aln.maf,                    \
+    compression=none,                              \
+    verbose=yes),                                  \
   SequenceStatistics(                              \
-      statistics=(BlockLength,BlockSize),          \
-      ref_species=$(REF),                          \
-      file=$(DATA).statistics2.txt),               \
+    statistics=(BlockLength,BlockSize),            \
+    ref_species=$(REF),                            \
+    file=$(DATA).statistics2.txt),                 \
   Merge(species=($(INDV)), dist_max=100),          \
   SequenceStatistics(                              \
-      statistics=(BlockLength,BlockSize),          \
-      ref_species=$(REF),                          \
-      file=$(DATA).statistics3.txt),               \
+    statistics=(BlockLength,BlockSize),            \
+    ref_species=$(REF),                            \
+    file=$(DATA).statistics3.txt),                 \
   Output(                                          \
-      file=$(DATA).filtered.maf.gz,                \
-      compression=gzip),                           \  
+    file=$(DATA).filtered.maf.gz,                  \
+    compression=gzip),                             \  
   MinBlockLength(min_length=$(WSIZE)),             \
   WindowSplit(                                     \
-      preferred_size=$(WSIZE),                     \
-      align=center,                                \
-      keep_small_blocks=no),                       \
+    preferred_size=$(WSIZE),                       \
+    align=center,                                  \
+    keep_small_blocks=no),                         \
   SequenceStatistics(                              \
-      statistics=(BlockLength,BlockSize,           \
-         DiversityStatistics(,                     \
-           ingroup=($(INDV))),                     \
-         SiteFrequencySpectrum(                    \
-           ingroup=($(INDV)),                      \
-           bounds=(-0.5,0.5,1.5,2.5,3.5,4.5,5.5))  \
-        ),                                         \
-      ref_species=$(REF),                          \
-      file=$(DATA).diversity_statistics.txt)       \
+    statistics=(BlockLength,BlockSize,             \
+      DiversityStatistics(,                        \
+        ingroup=($(INDV))),                        \
+      SiteFrequencySpectrum(                       \
+        ingroup=($(INDV)),                         \
+        bounds=(-0.5,0.5,1.5,2.5,3.5,4.5,5.5))     \
+      ),                                           \
+    ref_species=$(REF),                            \
+    file=$(DATA).diversity_statistics.txt)         \
 
