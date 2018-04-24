@@ -1,0 +1,88 @@
+# maffilter param=MafFilter-Phylogeny.bpp
+
+DATA=chr9
+SPECIES=(hg38, panPan1, panTro4, gorGor3, ponAbe2)
+WSIZE=10000
+
+input.file=../Primates/$(DATA).maf.gz
+input.file.compression=gzip
+input.format=Maf
+output.log=$(DATA).maffilter.log
+maf.filter=                                        \
+  Subset(                                          \
+    species=$(SPECIES),                            \
+    strict=yes, keep=no,                           \
+    remove_duplicates=yes),                        \
+  XFullGap(species=$(SPECIES), verbose=no),        \
+  MinBlockLength(min_length=10),                   \
+  AlnFilter2(verbose=no,                           \
+    species=$(SPECIES),                            \
+    window.size=10, window.step=1,                 \
+    missing_as_gap=yes,                            \
+    max.gap=2, max.pos=2, relative=no,             \
+    file=$(DATA).trash_aln.maf,                    \
+    compression=none),                             \
+  Merge(                                           \
+    species=$(SPECIES),                            \
+    dist_max=100,                                  \
+    rename_chimeric_chromosomes=yes),              \
+  Output(                                          \
+    file=$(DATA).filtered.maf.gz,                  \
+    compression=gzip),                             \  
+  MinBlockLength(min_length=$(WSIZE)),             \
+  WindowSplit(                                     \
+    preferred_size=$(WSIZE),                       \
+    align=center,                                  \
+    keep_small_blocks=no),                         \
+  DistanceEstimation(verbose=no,                   \
+    method=ml,                                     \
+    model=K80(kappa=2),                            \
+    rate=Gamma(n=4, alpha=0.5),                    \
+    parameter_estimation=initial,                  \
+    max_freq_gaps=0.33,                            \
+    gaps_as_unresolved=yes,                        \
+    profiler=none,                                 \
+    message_handler=none,                          \
+    extended_names=yes),                           \
+  DistanceBasedPhylogeny(verbose=no,               \
+    method=bionj, dist_mat=MLDistance),            \
+  NewOutgroup(                                     \
+    tree_input=BioNJ,                              \
+    tree_output=BioNJ_rooted,                      \
+    outgroup=ponAbe2),                             \
+  OutputTrees(                                     \
+    tree=BioNJ_rooted,                             \
+    file=$(DATA).trees.dnd,                        \
+    compression=gzip,                              \
+    strip_names=yes),                              \
+  DropSpecies(                                     \
+    tree_input=BioNJ_rooted,                       \
+    tree_output=BioNJ_subtree,                     \
+    species=ponabe2),                              \
+  SequenceStatistics(                              \
+    statistics=(                                   \
+      BlockCounts(),                               \
+      ModelFit(                                    \
+        model=HKY85(kappa=1, theta=0.5,            \
+                    theta1=0.5, theta2=0.5),       \
+        rate_distribution=Gamma(n=4, alpha=0.5),   \
+        root_freq=Full,                            \
+        tree=BioNJ_subtree,                        \
+        parameters_output=(HKY85.theta_1,          \
+            HKY85.theta1_1, HKY85.theta2_1,        \
+            HKY85.kappa_1, Gamma.alpha,            \
+            Full.theta1, Full.theta2, Full.theta), \
+        fixed_parameters=(),                       \
+        reestimate_brlen=no,                       \
+        max_freq_gaps=0.3,                         \
+        gaps_as_unresolved=yes)),                  \
+      ref_species=hg38,                            \
+      file=$(DATA).model-statistics.csv),          \
+
+#  FeatureFilter(verbose=no,                        \
+#    ref_species=hg38,                              \
+#    feature.file=../Primates/chr9.nodup.gtf,       \
+#    feature.file.compression=none,                 \
+#    feature.format=GTF,                            \
+#    feature.type=exon),                            \
+
