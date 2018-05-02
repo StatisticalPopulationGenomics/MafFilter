@@ -1,4 +1,4 @@
-# maffilter param=MafFilter-Phylogeny.bpp
+# maffilter param=MafFilter-Phylogeny-NoCDS.bpp
 
 DATA=chr9
 SPECIES=(hg38, panPan1, panTro4, gorGor3, ponAbe2)
@@ -7,7 +7,7 @@ WSIZE=10000
 input.file=../Primates/$(DATA).maf.gz
 input.file.compression=gzip
 input.format=Maf
-output.log=$(DATA).maffilter.log
+output.log=$(DATA).maffilter-nocds.log
 maf.filter=                                        \
   Subset(                                          \
     species=$(SPECIES),                            \
@@ -20,8 +20,14 @@ maf.filter=                                        \
     window.size=10, window.step=1,                 \
     missing_as_gap=yes,                            \
     max.gap=2, max.pos=2, relative=no,             \
-    file=$(DATA).trash_aln.maf,                    \
+    file=None,                                     \
     compression=none),                             \
+  FeatureFilter(verbose=no,                        \
+    ref_species=hg38,                              \
+    feature.file=../Primates/chr9.nodup.gtf,       \
+    feature.file.compression=none,                 \
+    feature.format=GTF,                            \
+    feature.type=exon),                            \
   Merge(                                           \
     species=$(SPECIES),                            \
     dist_max=100,                                  \
@@ -52,7 +58,7 @@ maf.filter=                                        \
     outgroup=ponAbe2),                             \
   OutputTrees(                                     \
     tree=BioNJ_rooted,                             \
-    file=$(DATA).trees.dnd,                        \
+    file=$(DATA).trees-nocds.dnd,                  \
     compression=gzip,                              \
     strip_names=yes),                              \
   DropSpecies(                                     \
@@ -82,5 +88,6 @@ maf.filter=                                        \
         max_freq_gaps=0.3,                         \
         gaps_as_unresolved=yes)),                  \
       ref_species=hg38,                            \
-      file=$(DATA).model-statistics.csv),          \
+      file=$(DATA).model-statistics-nocds.csv),    \
+
 

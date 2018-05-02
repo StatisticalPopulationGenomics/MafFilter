@@ -3,16 +3,31 @@
 # Read the statistics:
 stats.model <- read.table("chr9.model-statistics.csv", header = TRUE, stringsAsFactors = FALSE)
 stats.model$Mid <- with(stats.model, (Stop + Start) / 2)
-stats.model$GCobs <- with(stats.model, (Counts.G + Counts.C) / (Counts.A + Counts.C + Counts.G + Counts.T))
+
+stats.model$GCobs.hs <- with(stats.model, (Counts.hs.G + Counts.hs.C) / (Counts.hs.A + Counts.hs.C + Counts.hs.G + Counts.hs.T))
+stats.model$GCobs.pp <- with(stats.model, (Counts.pp.G + Counts.pp.C) / (Counts.pp.A + Counts.pp.C + Counts.pp.G + Counts.pp.T))
+stats.model$GCobs.pt <- with(stats.model, (Counts.pt.G + Counts.pt.C) / (Counts.pt.A + Counts.pt.C + Counts.pt.G + Counts.pt.T))
+stats.model$GCobs.gg <- with(stats.model, (Counts.gg.G + Counts.gg.C) / (Counts.gg.A + Counts.gg.C + Counts.gg.G + Counts.gg.T))
+stats.model$GCobs.pa <- with(stats.model, (Counts.pa.G + Counts.pa.C) / (Counts.pa.A + Counts.pa.C + Counts.pa.G + Counts.pa.T))
+stats.model$GCobs.all <- with(stats.model, (Counts.all.G + Counts.all.C) / (Counts.all.A + Counts.all.C + Counts.all.G + Counts.all.T))
+
+# Compare GC content in all extant species:
+library(corrgram)
+corrgram(stats.model[, c("GCobs.hs", "GCobs.pp", "GCobs.pt", "GCobs.gg", "GCobs.pa")],
+         order=TRUE, lower.panel=panel.pts,
+         upper.panel=panel.ellipse, text.panel=panel.txt,
+         main="GC content")
+
+# => all extremely correlated, we take the average
 
 library(reshape2)
 library(ggplot2)
 library(cowplot)
 
-stats.gc <- stats.model[, c("Mid", "GCobs", "MLModelFit.HKY85.theta_1", "MLModelFit.Full.theta")]
+stats.gc <- stats.model[, c("Mid", "GCobs.all", "MLModelFit.HKY85.theta_1", "MLModelFit.Full.theta")]
 stats.gc <- melt(stats.gc, id.vars = "Mid")
 stats.gc$GC <- factor(stats.gc$variable,
-                      levels = c("GCobs", "MLModelFit.HKY85.theta_1", "MLModelFit.Full.theta"),
+                      levels = c("GCobs.all", "MLModelFit.HKY85.theta_1", "MLModelFit.Full.theta"),
                       labels = c("Observed", "Equilibrium", "Ancestral"))
 p.gc <- ggplot(stats.gc, aes(x = Mid/1e6, y = value))
 p.gc <- p.gc + geom_point(aes(col = GC), alpha = 0.5) + geom_smooth(aes(col = GC))
