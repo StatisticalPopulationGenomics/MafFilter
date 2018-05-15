@@ -59,7 +59,7 @@ maf.filter=                                        \
   OutputTrees(                                     \
     tree=BioNJ_rooted,                             \
     file=$(DATA).trees-nocds.dnd,                  \
-    compression=gzip,                              \
+    compression=none,                              \
     strip_names=yes),                              \
   DropSpecies(                                     \
     tree_input=BioNJ_rooted,                       \
