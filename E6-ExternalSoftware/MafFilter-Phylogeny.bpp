@@ -1,0 +1,49 @@
+# maffilter param=MafFilter-Phylogeny.bpp
+
+DATA=chr9_realigned
+SPECIES=(hg38, panPan1, panTro4, gorGor3, ponAbe2)
+WSIZE=10000
+
+input.file=$(DATA).maf.gz
+input.file.compression=gzip
+input.format=Maf
+output.log=$(DATA).maffilter-phylogeny.log
+maf.filter=                                        \
+  MinBlockLength(min_length=10),                   \
+  AlnFilter2(verbose=no,                           \
+    species=$(SPECIES),                            \
+    window.size=10, window.step=1,                 \
+    missing_as_gap=yes,                            \
+    max.gap=2, max.pos=2, relative=no,             \
+    file=$(DATA).trash_aln.maf,                    \
+    compression=none),                             \
+  Merge(                                           \
+    species=$(SPECIES),                            \
+    dist_max=100,                                  \
+    rename_chimeric_chromosomes=yes),              \
+  Output(                                          \
+    file=$(DATA)_filtered.maf.gz,                  \
+    compression=gzip),                             \  
+  MinBlockLength(min_length=$(WSIZE)),             \
+  WindowSplit(                                     \
+    preferred_size=$(WSIZE),                       \
+    align=center,                                  \
+    keep_small_blocks=no),                         \
+  ExternalTreeBuilding(                            \
+    input.file=blockIn.phy ,                       \
+    input.format=Phylip(                           \
+      order=sequential, type=extended),            \
+    output.file=blockIn.phy_phyml_tree,            \
+    output.format=Newick,                          \
+    property_name=PhyML,                           \
+    call=./runPhyml.sh),                           \
+  NewOutgroup(                                     \
+    tree_input=PhyML,                              \
+    tree_output=PhyML_rooted,                      \
+    outgroup=ponAbe2),                             \
+  OutputTrees(                                     \
+    tree=PhyML_rooted,                             \
+    file=$(DATA).trees.dnd,                        \
+    compression=none,                              \
+    strip_names=yes)                               \
+

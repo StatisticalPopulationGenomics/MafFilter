@@ -47,7 +47,7 @@ p.op <- p.op + scale_color_manual(values = c(Ancestral = "#619CFF", Equilibrium 
 p.op <- p.op + facet_grid(Param+Type~., scales = "free_y") + guides(color = FALSE) + xlab("Position (Mb)")
 p.op
 
-pp <- plot_grid(p.gc, p.op, labels = "AUTO", nrow = 1)
+pp <- plot_grid(p.op, p.gc, labels = "AUTO", nrow = 1)
 pp
 
 ggsave(pp, filename = "Parameters.pdf", width = 12, height = 8)
@@ -58,7 +58,8 @@ library(ape)
 trees <- read.tree(file = "chr9.trees.dnd")
 
 # Consensus tree (majority rule)
-plot(consensus(trees, p = 0.5))
+ctree <- consensus(trees, p = 0.5)
+plot(ctree)
 
 # Sort all topologies:
 tree.classes <-list()
@@ -107,17 +108,23 @@ library(ggtree)
 get.tree.plot <- function(tree, freq) {
   p <- ggplot(tree, aes(x, y)) + theme_tree(plot.title = element_text(hjust = 0.5)) + xlim(0, 0.025)
   p <- p + geom_tree(layout = "rectangular") + geom_treescale(x = 0, y = 4.5)
-  p <- p + geom_tiplab() + ggtitle(paste(freq, "trees"))
+  p <- p + geom_tiplab()
+  p <- p + ggtitle(paste(freq, "trees"))
   return(p)
 }
 
+p.t0 <- ggplot(ctree, aes(x, y)) + xlim(0, 5) +
+  geom_tree(layout = "rectangular") +
+  ggtitle("Consensus topology") +
+  theme_tree(plot.title = element_text(hjust = 0.5)) +
+  geom_tiplab()
 p.t1 <- get.tree.plot(av.trees[[1]], 767)
 p.t2 <- get.tree.plot(av.trees[[2]], 55)
 p.t3 <- get.tree.plot(av.trees[[3]], 54)
 p.t4 <- get.tree.plot(av.trees[[4]], 3)
 p.t5 <- get.tree.plot(av.trees[[5]], 4)
 
-p.t <- plot_grid(p.t1, p.t2, p.t3, p.t4, p.t5, nrow = 2, labels = "AUTO")
+p.t <- plot_grid(p.t0, p.t1, p.t2, p.t3, p.t4, p.t5, nrow = 2, labels = "AUTO")
 p.t
 
 ggsave(p.t, filename = "Topologies.pdf", width = 12*0.8, height = 8*0.8)

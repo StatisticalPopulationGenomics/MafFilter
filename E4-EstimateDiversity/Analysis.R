@@ -106,3 +106,7 @@ p <- plot_grid(p.sum + coord_flip() + scale_x_discrete(limits = rev(levels(stats
 p
 
 ggsave(p, filename = "DrosophilaDiversity.pdf", width = 14, height = 14)
+
+# distance to centromere (on the right of chromosome 2L):
+cor.test(~Start+SequenceDiversityStatistics.TajimaPi, stats.div, method = "kendall")
+

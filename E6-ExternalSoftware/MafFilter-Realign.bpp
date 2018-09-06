@@ -1,0 +1,42 @@
+DATA=chr9
+SPECIES=(hg38, panPan1, panTro4, gorGor3, ponAbe2)
+
+input.file=../Primates/$(DATA).maf.gz
+input.file.compression=gzip
+input.format=Maf
+output.log=$(DATA).maffilter-realign.log
+maf.filter=                                        \
+  Subset(                                          \
+    species=$(SPECIES),                            \
+    strict=yes, keep=no,                           \
+    remove_duplicates=yes),                        \
+  XFullGap(species=$(SPECIES), verbose=no),        \
+  SequenceStatistics(                              \
+    statistics=(BlockSize, BlockLength),           \
+    ref_species=Zt09,                              \
+    file=$(DATA)_subset.statistics.csv),           \
+  WindowSplit(                                     \
+    preferred_size=10000,                          \
+    align=adjust,                                  \
+    keep_small_blocks=yes),                        \
+  SystemCall(                                      \
+    name=MAFFT,                                    \
+    input.file=blockIn.fasta,                      \
+    input.format=Fasta,                            \
+    output.file=blockOut.fasta,                    \
+    output.format=Fasta,                           \
+    call=./runMafft.sh),                           \
+  Merge(                                           \
+    species=$(SPECIES),                            \
+    dist_max=0,                                    \
+    rename_chimeric_chromosomes=yes),              \
+  SequenceStatistics(                              \
+    statistics=(BlockSize, BlockLength),           \
+    ref_species=Zt09,                              \
+    file=$(DATA)_windows_realigned.statistics.csv),\
+  Output(                                          \
+    file=$(DATA)_realigned.maf.gz,                 \
+    compression=gzip,                              \
+    verbose=1)                                     \
+
+
