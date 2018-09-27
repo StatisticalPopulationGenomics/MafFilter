@@ -1,0 +1,24 @@
+DATA=chr9
+SPECIES=(hg38, gorGor3)
+
+input.file=../Primates/$(DATA).maf.gz
+input.file.compression=gzip
+input.format=Maf
+output.log=$(DATA).maffilter-liftover.log
+maf.filter=                                        \
+  Subset(                                          \
+    species=$(SPECIES),                            \
+    strict=yes, keep=no,                           \
+    remove_duplicates=yes),                        \
+  XFullGap(species=$(SPECIES), verbose=no),        \
+  Merge(species=$(SPECIES)),                       \
+  LiftOver(                                        \
+    ref_species=hg38,                              \
+    target_species=gorGor3,                        \
+    target_closest_position=yes,                   \
+    feature.file=../Primates/chr9.CDS1kb.gtf,      \
+    feature.file.compression=none,                 \
+    feature.format=GTF,                            \
+    file=hg38_to_gorGor3.tln,                      \
+    compression=none)                              \       
+
