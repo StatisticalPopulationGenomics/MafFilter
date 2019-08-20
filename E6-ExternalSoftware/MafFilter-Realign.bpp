@@ -25,14 +25,16 @@ maf.filter=                                        \
     input.format=Fasta,                            \
     output.file=blockOut.fasta,                    \
     output.format=Fasta,                           \
+    hot=yes,                                       \ #Note: computation of hot scores is a beta feature, which will be ignored when using the stable version.
     call=./runMafft.sh),                           \
   Merge(                                           \
     species=$(SPECIES),                            \
     dist_max=0,                                    \
     rename_chimeric_chromosomes=yes),              \
   SequenceStatistics(                              \
-    statistics=(BlockSize, BlockLength),           \
-    ref_species=Zt09,                              \
+    statistics=(BlockSize, BlockLength,            \
+                AlnScore),                         \
+    ref_species=hg38,                              \
     file=$(DATA)_windows_realigned.statistics.csv),\
   Output(                                          \
     file=$(DATA)_realigned.maf.gz,                 \

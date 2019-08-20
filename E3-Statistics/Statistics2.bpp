@@ -1,0 +1,26 @@
+# maffilter param=Statistics2.bpp DATA=chr9
+
+input.file=../Primates/$(DATA).maf.gz
+input.file.compression=gzip
+input.format=Maf
+output.log=$(DATA).maffilter.log
+SPECIES=(hg38, panPan1)#, panTro4, gorGor3, ponAbe2)
+maf.filter=                                        \
+  Subset(                                          \
+      species=$(SPECIES),                          \
+      strict=yes, keep=no,                         \
+      remove_duplicates=yes),                      \
+  Merge(                                           \
+      species=$(SPECIES),                                \
+      dist_max=0),                                 \
+  ExtractFeature(                                  \
+      ref_species=hg38,                            \
+      feature.file=../Primates/chr9.CDS1kb.gtf,    \
+      feature.format=GTF,                          \
+      complete=yes,                                \
+      ignore_strand=no),                           \
+  SequenceStatistics(                              \
+      statistics=(BlockLength,BlockSize),          \
+      ref_species=hg38,                            \
+      file=$(DATA).statistics5.txt)                \
+
