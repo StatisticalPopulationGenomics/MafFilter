@@ -13,7 +13,7 @@ maf.filter=                                        \
   XFullGap(species=$(SPECIES), verbose=no),        \
   SequenceStatistics(                              \
     statistics=(BlockSize, BlockLength),           \
-    ref_species=Zt09,                              \
+    ref_species=hg38,                              \
     file=$(DATA)_subset.statistics.csv),           \
   WindowSplit(                                     \
     preferred_size=10000,                          \
